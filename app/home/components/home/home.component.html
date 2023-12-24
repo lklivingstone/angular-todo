@@ -1,0 +1,96 @@
+<navbar></navbar>
+<div
+(drop)="dropInvalid($event)"
+(dragover)="allowDrop($event)"
+class="w-screen h-screen bg-[#292a2c] flex justify-center items-center">
+    <div class="sm:w-full md:w-2/3 lg:w-1/3 relative shadow-md  bg-zinc-700 h-5/6 mx-auto">
+        <div class="flex items-center p-5 justify-between shadow-sm bg-[#1f2124]">
+            <h1 class="text-3xl font-extrabold text-center text-[#f68657]">Notes</h1>
+        </div>
+        <div class="flex items-center justify-center w-full p-[12px] bg-[#1f2124]">
+            <input
+            type="text"
+            [(ngModel)]="task"
+            class="form-control h-[35px] bg-[#383a3f] border-none p-4 mr-2 text-[#d6d1d1] w-5/12"
+            id="task"
+            name="task"
+            placeholder="Task"
+            (keyup.enter)="addTaskSubmit()"
+            >
+            <input
+            type="text"
+            [(ngModel)]="status"
+            class="form-control h-[35px] bg-[#383a3f] border-none p-4 text-[#d6d1d1] w-5/12"
+            id="status"
+            placeholder="Status"
+            name="status"
+            (keyup.enter)="addTaskSubmit()"
+            >
+            <button type="submit"
+            class="h-[35px] px-[20px] bg-[#f68657] border-none text-[#1f2124] cursor-pointer w-2/12"
+            (click)="addTaskSubmit()"
+            >Add</button>
+            
+            <p *ngIf="addError" class="px-[12px]">Task and Status Required</p>
+        </div>
+        <div class="p-0 my-4 h-70vh overflow-y-auto scrollbar-none">
+            <div class="form-group flex w-full justify-around items-center text-[#d6d1d1]">
+                <h2 class="font-semibold">Filter: </h2>
+                <select
+                name="filter" 
+                id="filter" 
+                class="form-control h-[30px] bg-[#383a3f] border-[1px] border-[#212225] mr-1 text-[#d6d1d1]"
+                [(ngModel)]="selectedFilter">
+                    <option value='All'>All</option>
+                    <option
+                    *ngFor="let status of uniqueStatuses()"
+                    [value]="status"
+                    >
+                        {{status}}
+                    </option>
+                </select>
+            </div>
+            <div
+            *ngFor="let task of getTasks()"
+            class="m-[12px] p-[10px] transition-all text-[#d6d1d1] duration-200 ease-in-out bg-[#252629] flex items-center flex-col hover:transition-all hover:bg-$color-dark"
+            draggable="true"
+            (dragstart)="drag($event)" 
+            [attr.id]="task.id"
+            >
+                <div class="w-full mb-[10px] flex justify-between">
+                    <h1 class="font-semibold">{{task.name}} : {{task.status}}</h1>
+                    <fa-icon
+                    class="cursor-pointer"
+                    (click)="editTask(task.id)"
+                    [icon]="faPencil"
+                    [ngStyle]="{ color: '#d6d1d1' }"
+                    ></fa-icon>
+                </div>
+                <div class="flex items-center w-4/5">
+                    <input *ngIf="isEditing(task.id)" 
+                    [(ngModel)]="updateStatus" 
+                    class="flex-1 h-[35px] bg-[#383a3f] border-none p-4 text-#d6d1d1 w-4/5"
+                    placeholder="Mention the status" 
+                    (keyup.enter)="updateTask(task.id)" />
+
+                <button *ngIf="isEditing(task.id)" 
+                        (click)="updateTask(task.id)" 
+                        class="h-[35px] px-[20px] bg-[#f68657] border-none text-[#1f2124]">Update</button>
+                </div>
+            </div>
+        </div>
+        <div
+        id="delete"
+        (drop)="drop($event)"
+        (dragover)="allowDrop($event)"  
+        class="flex items-center justify-center absolute bottom-0 left-0 w-full h-[50px] bg-gradient-to-t from-red-500 to-transparent opacity-0 transition-opacity duration-300" [style.opacity]="displayDelete ? 1 : 0">
+        </div>
+
+    </div>
+    <div
+    class="fixed bottom-[10px] right-[10px] bg-opacity-0 text-[#acb4bd] border-2 border-[#acb4bd] rounded-2 p-3 flex items-center">
+        <div class="delete-message">
+          <p>Drag and drop to delete tasks.</p>
+        </div>
+      </div>
+</div>
